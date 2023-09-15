@@ -30,15 +30,19 @@ from amaranth.build import Platform
 from .colorlight_i9 import Colorlight_I9_V7_2_Platform
 from .the_cradle import TheCradle
 
-class Deployer():
-    def __init__(self, endpoint:Platform, payload:Elaboratable):
+
+class Deployer:
+    def __init__(self, endpoint: Platform, payload: Elaboratable):
         self.endpoint = endpoint
         self.payload = payload
 
     def deploy(self):
-        print(f"========================[ START OF Deployment ]============================")
-        self.endpoint.build(self.payload, do_program = True)
+        print(
+            f"========================[ START OF Deployment ]============================"
+        )
+        self.endpoint.build(self.payload, do_program=True)
         print(f"-- -- -- -- -- -- -- -- [ END OF Deployment ] -- -- -- -- -- -- -- --")
 
+
 if __name__ == "__main__":
-    Deployer(Colorlight_I9_V7_2_Platform(),TheCradle()).deploy()
+    Deployer(Colorlight_I9_V7_2_Platform(), TheCradle()).deploy()
