@@ -18,7 +18,6 @@ You should have received a copy of the GNU Lesser General Public License along w
 If not, see <https://www.gnu.org/licenses/>. 
 ---
 """
-
 ### builtin deps
 from typing import List  # , Dict, Tuple, Optional
 
@@ -27,18 +26,19 @@ from amaranth import *
 from amaranth.build import Platform
 
 ### project deps
-from .colorlight_i9 import Colorlight_I9_V7_2_Platform
-from .the_cradle import TheCradle
+from .blinky import Blinky
 
-class Deployer():
-    def __init__(self, endpoint:Platform, payload:Elaboratable):
-        self.endpoint = endpoint
-        self.payload = payload
 
-    def deploy(self):
-        print(f"========================[ START OF Deployment ]============================")
-        self.endpoint.build(self.payload, do_program = True)
-        print(f"-- -- -- -- -- -- -- -- [ END OF Deployment ] -- -- -- -- -- -- -- --")
+class TheCradle(Elaboratable):
+    def __init__(self):
+        pass
 
-if __name__ == "__main__":
-    Deployer(Colorlight_I9_V7_2_Platform(),TheCradle()).deploy()
+    def elaborate(self, platform: Platform) -> Module:
+        m = Module()
+
+        ## All the modules to instanciate
+        m.submodules.blinky = Blinky()
+
+        ## modules interconnection
+
+        return m
