@@ -1,0 +1,37 @@
+### [project] section: 
+###     see https://peps.python.org/pep-0621/
+### [build-system] section: 
+###     see https://peps.python.org/pep-0517/
+###     see https://peps.python.org/pep-0518/
+### see https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+[build-system]
+requires = ["setuptools>=61", "setuptools-scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "the-cradle-colorlight-i9-ecp5-amaranth-hdl-by-sporniket"
+#version = "0.0.1"
+description = "An implementation of \"the cradle\" for the ECP5-based colorlight i9 written with the Amaranth HDL"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["amaranth","amaranth-hdl","nmigen", "hdl", "fpga", "ecp5", "colorlight i9"]
+license = {file = "LICENSE"}
+authors = [{name="Sporniket", email="sporniket.studio@gmail.com"}]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+]
+dependencies = [
+    'amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@e12aa1885593723ed2d428d988146aac322dfe71',
+    'importlib-metadata; python_version>"3.8"',
+]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl"
+#TODO documentation = "https://readthedocs.org"
+repository = "https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl.git"
+bug-tracker = "https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl/issues"

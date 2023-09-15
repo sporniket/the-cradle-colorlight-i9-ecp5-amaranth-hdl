@@ -1,0 +1,4 @@
+#!/bin/bash
+# force coding style
+echo "Formatting source code..."
+python3 -m black .

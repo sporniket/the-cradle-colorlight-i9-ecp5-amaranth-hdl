@@ -1,0 +1,11 @@
+#!/bin/bash
+# prepare workspace
+./reclean
+./reformat
+# rebuild, install and test
+echo "Rebuild, Reinstall and Run tests..."
+python3 -m build && python3 -m pip install --force-reinstall dist/*.whl && \
+python3 -m coverage run --source=the_cradle --branch -m pytest && \
+python3 -m coverage report -m && \
+python3 -m coverage html 
+
