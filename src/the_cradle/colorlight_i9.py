@@ -65,7 +65,7 @@ class Colorlight_I9_V7_2_Platform(LatticeECP5Platform):
             pins="L2", attrs=Attrs(IO_TYPE="LVCMOS33", DRIVE="4")
         ),  # the sample use LVCMOS25, but this pins is also accessible out of the board
 
-        HDMIResource(0, hdmi_channels, attrs = Attrs(IO_TYPE="LVCMOS33", DRIVE="4"))
+        HDMIResource(0, hdmi_channels, attrs = Attrs(IO_TYPE="LVCMOS33", DRIVE="4")) # See also https://github.com/lawrie/ulx3s_examples/blob/master/video/checkers/ulx3s_v20.lpf#L316-L323
     ]
 
     # no connectors for now
