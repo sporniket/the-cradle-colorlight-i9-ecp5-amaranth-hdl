@@ -35,105 +35,8 @@ from amaranth_stuff.modules import (
     DviTmdsEncoder,
 )
 
-## pll parameters to get the frequencies [270, 108, 27, 31]MHz
-mainPllParameters_720x576_50 = {
-    "p_PLLRST_ENA": "DISABLED",
-    "p_INTFB_WAKE": "DISABLED",
-    "p_STDBY_ENABLE": "DISABLED",
-    "p_DPHASE_SOURCE": "DISABLED",
-    "p_OUTDIVIDER_MUXA": "DIVA",
-    "p_OUTDIVIDER_MUXB": "DIVB",
-    "p_OUTDIVIDER_MUXC": "DIVC",
-    "p_OUTDIVIDER_MUXD": "DIVD",
-    "p_CLKI_DIV": 5,
-    "p_CLKOP_ENABLE": "ENABLED",
-    "p_CLKOP_DIV": 2,
-    "p_CLKOP_CPHASE": 1,
-    "p_CLKOP_FPHASE": 0,
-    "p_CLKOS_ENABLE": "ENABLED",
-    "p_CLKOS_DIV": 5,
-    "p_CLKOS_CPHASE": 1,
-    "p_CLKOS_FPHASE": 0,
-    "p_CLKOS2_ENABLE": "ENABLED",
-    "p_CLKOS2_DIV": 20,
-    "p_CLKOS2_CPHASE": 1,
-    "p_CLKOS2_FPHASE": 0,
-    "p_CLKOS3_ENABLE": "ENABLED",
-    "p_CLKOS3_DIV": 17,
-    "p_CLKOS3_CPHASE": 1,
-    "p_CLKOS3_FPHASE": 0,
-    "p_FEEDBK_PATH": "CLKOP",
-    "p_CLKFB_DIV": 54,
-    "i_RST": 0,
-    "i_STDBY": 0,
-    "i_PHASESEL0": 0,
-    "i_PHASESEL1": 0,
-    "i_PHASEDIR": 1,
-    "i_PHASESTEP": 1,
-    "i_PHASELOADREG": 1,
-    "i_PLLWAKESYNC": 0,
-    "i_ENCLKOP": 0,
-}
-
-## pll parameters to get the frequencies [250, 108, 25, 31]MHz
-mainPllParameters_640x480_59_94 = {
-    "p_PLLRST_ENA": "DISABLED",
-    "p_INTFB_WAKE": "DISABLED",
-    "p_STDBY_ENABLE": "DISABLED",
-    "p_DPHASE_SOURCE": "DISABLED",
-    "p_OUTDIVIDER_MUXA": "DIVA",
-    "p_OUTDIVIDER_MUXB": "DIVB",
-    "p_OUTDIVIDER_MUXC": "DIVC",
-    "p_OUTDIVIDER_MUXD": "DIVD",
-    "p_CLKI_DIV": 1,
-    "p_CLKOP_ENABLE": "ENABLED",
-    "p_CLKOP_DIV": 2,
-    "p_CLKOP_CPHASE": 0,
-    "p_CLKOP_FPHASE": 0,
-    "p_CLKOS_ENABLE": "ENABLED",
-    "p_CLKOS_DIV": 4,
-    "p_CLKOS_CPHASE": 0,
-    "p_CLKOS_FPHASE": 0,
-    "p_CLKOS2_ENABLE": "ENABLED",
-    "p_CLKOS2_DIV": 20,
-    "p_CLKOS2_CPHASE": 0,
-    "p_CLKOS2_FPHASE": 0,
-    "p_CLKOS3_ENABLE": "ENABLED",
-    "p_CLKOS3_DIV": 16,
-    "p_CLKOS3_CPHASE": 0,
-    "p_CLKOS3_FPHASE": 0,
-    "p_FEEDBK_PATH": "CLKOP",
-    "p_CLKFB_DIV": 10,
-    "i_RST": 0,
-    "i_STDBY": 0,
-    "i_PHASESEL0": 0,
-    "i_PHASESEL1": 0,
-    "i_PHASEDIR": 1,
-    "i_PHASESTEP": 1,
-    "i_PHASELOADREG": 1,
-    "i_PLLWAKESYNC": 0,
-    "i_ENCLKOP": 0,
-}
-
-## Video timings for 720x576@50Hz
-## sequence of pixels in a single scan line [sync, back porch, active, front porch]
-pixelSequence_720x576_50 = [64, 68, 720, 12]  # total = 864
-
-## sequence of scanlines in a video screen [sync, back porch, active, front porch]
-scanlineSequence_720x576_50 = [5, 39, 576, 5]  # total = 625
-
-## Video timings for 640x480@59.94
-## sequence of pixels in a single scan line [sync, back porch, active, front porch]
-pixelSequence_640x480_59_94 = [96, 48, 640, 16]  # total = 800
-
-## sequence of scanlines in a video screen [sync, back porch, active, front porch]
-scanlineSequence_640x480_59_94 = [2, 33, 480, 10]  # total = 525
-
-mainPllParameters, pixelSequence, scanlineSequence = (
-    mainPllParameters_640x480_59_94,
-    pixelSequence_640x480_59_94,
-    scanlineSequence_640x480_59_94,
-)
+from .vid_settings_640x480_59Hz94 import mainPllParameters, pixelSequence, scanlineSequence 
+# from .vid_settings_720x576_50Hz import mainPllParameters, pixelSequence, scanlineSequence 
 
 
 class TheCradle(Elaboratable):
@@ -174,7 +77,7 @@ class TheCradle(Elaboratable):
         m.domains += domCpuBase
 
         ### Pixel sequencer -> hsync clock
-        m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("pixel")(
+        m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("sync")(
             Sequencer(pixelSequence)
         )
         hsync = Signal()
@@ -235,14 +138,14 @@ class TheCradle(Elaboratable):
             greenTmds,
             redTmds,
         ) = (
-            DomainRenamer("pixel")(DviTmdsEncoder(blue, vde, hsync, vsync)),
-            DomainRenamer("pixel")(DviTmdsEncoder(green, vde, ctl0, ctl1)),
-            DomainRenamer("pixel")(DviTmdsEncoder(red, vde, ctl2, ctl3)),
+            DomainRenamer("sync")(DviTmdsEncoder(blue, vde, hsync, vsync)),
+            DomainRenamer("sync")(DviTmdsEncoder(green, vde, ctl0, ctl1)),
+            DomainRenamer("sync")(DviTmdsEncoder(red, vde, ctl2, ctl3)),
         )
 
         channelClockSource = Signal(10)
-        # m.d.comb += channelClockSource.eq(0b1111100000)
-        m.d.comb += channelClockSource.eq(0b0000011111)
+        m.d.comb += channelClockSource.eq(0b1111100000)
+        # m.d.comb += channelClockSource.eq(0b0000011111)
         (
             m.submodules.channel0,
             m.submodules.channel1,
