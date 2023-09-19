@@ -150,8 +150,6 @@ class TheCradle(Elaboratable):
             Mux(blinky.submodules.beat.beat_p, 0x0055AA, 0xAA9955)
         )
 
-        # TODO : step 1 : checkered, 16x8 pattern
-        # TODO : step 2 : colorful gradient tiles
         ### The dvi link
         m.submodules.blueTmds, m.submodules.greenTmds, m.submodules.redTmds = (
             blueTmds,
@@ -176,7 +174,18 @@ class TheCradle(Elaboratable):
                 ShiftRegisterTx(Signal(unsigned(10), reset=0b0000011111))
             ),
         )
-        # TODO : the ressource gpios of the hdmi link, using the output of the shift registers
+
+        hdmiMain = platform.request("hdmi", 0)
+        m.d.comb += [
+            hdmiMain.c0_p.eq(channel0.dataOut),
+            hdmiMain.c0_n.eq(channel0.dataOutInverted),
+            hdmiMain.c1_p.eq(channel1.dataOut),
+            hdmiMain.c1_n.eq(channel1.dataOutInverted),
+            hdmiMain.c2_p.eq(channel2.dataOut),
+            hdmiMain.c2_n.eq(channel2.dataOutInverted),
+            hdmiMain.c3_p.eq(channelClock.dataOut),
+            hdmiMain.c3_n.eq(channelClock.dataOutInverted),
+        ]
 
         ### What you should get at this point
         #
