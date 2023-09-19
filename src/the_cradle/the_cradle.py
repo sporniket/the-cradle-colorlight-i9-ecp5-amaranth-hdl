@@ -187,6 +187,9 @@ class TheCradle(Elaboratable):
             DomainRenamer("pixel")(DviTmdsEncoder(red, vde, ctl2, ctl3)),
         )
 
+        channelClockSource = Signal(10)
+        # m.d.comb += channelClockSource.eq(0b1111100000)
+        m.d.comb += channelClockSource.eq(0b0000011111)
         (
             m.submodules.channel0,
             m.submodules.channel1,
@@ -196,9 +199,7 @@ class TheCradle(Elaboratable):
             DomainRenamer("dviLink")(ShiftRegisterSendLsbFirst(blueTmds.ports()[-1])),
             DomainRenamer("dviLink")(ShiftRegisterSendLsbFirst(greenTmds.ports()[-1])),
             DomainRenamer("dviLink")(ShiftRegisterSendLsbFirst(redTmds.ports()[-1])),
-            DomainRenamer("dviLink")(
-                ShiftRegisterSendLsbFirst(Signal(unsigned(10), reset=0b0000011111))
-            ),
+            DomainRenamer("dviLink")(ShiftRegisterSendLsbFirst(channelClockSource)),
         )
 
         hdmiMain = platform.request("hdmi", 0)
