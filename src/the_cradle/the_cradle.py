@@ -100,21 +100,25 @@ class TheCradle(Elaboratable):
             "dviLink", local=True
         )  # for the shift registers receiving TMDS encoded data
         m.d.comb += domDviLink.clk.eq(mainPll.clkout0)
+        m.domains += domDviLink
 
         domTheCradle = ClockDomain(
             "theCradle", local=True
         )  # save for later, unused now
         m.d.comb += domTheCradle.clk.eq(mainPll.clkout1)
+        m.domains += domTheCradle
 
         domPixel = ClockDomain(
             "pixel", local=True
         )  # for the TMDS encoder and the pixel source.
         m.d.comb += domPixel.clk.eq(mainPll.clkout2)
+        m.domains += domPixel
 
         domCpuBase = ClockDomain(
             "cpuBase", local=True
         )  # base for clocking the external CPU, unused now
         m.d.comb += domCpuBase.clk.eq(mainPll.clkout3)
+        m.domains += domCpuBase
 
         ### Pixel sequencer -> hsync clock
         m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("pixel")(
@@ -126,6 +130,7 @@ class TheCradle(Elaboratable):
 
         domHsync = ClockDomain("hsync", local=True)
         m.d.comb += domHsync.clk.eq(hsync)
+        m.domains += domHsync
 
         ### Scanline sequencer -> vsync clock + video display enable
         m.submodules.scanlineSequencer = scanlineSequencer = DomainRenamer("hsync")(
@@ -143,11 +148,13 @@ class TheCradle(Elaboratable):
 
         domVsync = ClockDomain("vsync", local=True)
         m.d.comb += domVsync.clk.eq(vsync)
+        m.domains += domVsync
 
         domHsyncActive = ClockDomain(
             "hsyncActive", local=True
         )  # in effect, serves to clock a counter of displayed line, reset at each vbl.
         m.d.comb += [domHsyncActive.clk.eq(hsyncActive), domHsyncActive.rst.eq(vsync)]
+        m.domains += domHsyncActive
 
         ### The pixel source
         videoSource = videoSolidBlink = Signal(
