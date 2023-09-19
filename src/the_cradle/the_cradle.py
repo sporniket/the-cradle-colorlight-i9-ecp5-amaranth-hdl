@@ -143,8 +143,9 @@ class TheCradle(Elaboratable):
         m.d.comb += [domHsyncActive.clk.eq(hsyncActive), domHsyncActive.rst.eq(vsync)]
 
         ### The pixel source
-        # TODO : step 0 : blinking solid blue-ish/solid grey-ish screen
-        videoSolidBlink = Signal(24)  # v[0:8] = blue, v[8:16] = green, v[16:24] = blue
+        videoSource = videoSolidBlink = Signal(
+            24
+        )  # v[0:8] = blue, v[8:16] = green, v[16:24] = blue
         m.d.comb += videoSolidBlink.eq(
             Mux(blinky.submodules.beat.beat_p, 0x0055AA, 0xAA9955)
         )
@@ -152,9 +153,30 @@ class TheCradle(Elaboratable):
         # TODO : step 1 : checkered, 16x8 pattern
         # TODO : step 2 : colorful gradient tiles
         ### The dvi link
+        m.submodules.blueTmds, m.submodules.greenTmds, m.submodules.redTmds = (
+            blueTmds,
+            greenTmds,
+            redTmds,
+        ) = (
+            DomainRenamer("pixel")(DviTmdsEncoder(videoSource[0:8], vde, hsync, vsync)),
+            DomainRenamer("pixel")(DviTmdsEncoder(videoSource[8:16], vde, 0, 0)),
+            DomainRenamer("pixel")(DviTmdsEncoder(videoSource[16:24], vde, 0, 0)),
+        )
+
+        (
+            m.submodules.channel0,
+            m.submodules.channel1,
+            m.submodules.channel2,
+            m.submodules.channelClock,
+        ) = (channel0, channel1, channel2, channelClock) = (
+            DomainRenamer("dviLink")(ShiftRegisterTx(blueTmds.ports[-1])),
+            DomainRenamer("dviLink")(ShiftRegisterTx(greenTmds.ports[-1])),
+            DomainRenamer("dviLink")(ShiftRegisterTx(redTmds.ports[-1])),
+            DomainRenamer("dviLink")(
+                ShiftRegisterTx(Signal(unsigned(10), reset=0b0000011111))
+            ),
+        )
         # TODO : the ressource gpios of the hdmi link, using the output of the shift registers
-        # TODO : the shift registers, using the TMDS encoder outputs
-        # TODO : the TMDS encoder, using the pixel source output
 
         ### What you should get at this point
         #
