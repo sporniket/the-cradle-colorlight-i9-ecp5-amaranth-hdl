@@ -28,7 +28,7 @@ from amaranth.build import Platform
 
 class PllInstance(Elaboratable):
     """Module that instanciate a EHXPLLL using a map of Instance parameters.
-    
+
     Does only support clkout0 as feedback."""
 
     def __init__(self, params: Dict):
@@ -63,7 +63,7 @@ class PllInstance(Elaboratable):
     def elaborate(self, platform: Platform) -> Module:
         m = Module()
 
-        pll = Instance("EHXPLLL",**self.params)
+        pll = Instance("EHXPLLL", **self.params)
         m.submodules.pll += pll
 
         return m
