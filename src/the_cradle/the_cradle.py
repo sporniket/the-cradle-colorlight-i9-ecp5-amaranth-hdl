@@ -35,13 +35,29 @@ from amaranth_stuff.modules import (
     DviTmdsEncoder,
 )
 
-from .vid_settings_640x480_59Hz94 import mainPllParameters, pixelSequence, scanlineSequence 
-# from .vid_settings_720x576_50Hz import mainPllParameters, pixelSequence, scanlineSequence 
+from .vid_settings_640x480_59Hz94 import (
+    mainPllParameters,
+    mainPllClockMap,
+    pixelSequence,
+    scanlineSequence,
+)
+
+# from .vid_settings_720x576_50Hz import mainPllParameters, pixelSequence, scanlineSequence
 
 
 class TheCradle(Elaboratable):
     def __init__(self):
         pass
+
+    def createClockDomain(
+        self, m: Module, name: str, sourceClock, sourceReset=None
+    ) -> ClockDomain:
+        result = ClockDomain(name, local=True)
+        m.d.comb += result.clk.eq(sourceClock)
+        if sourceReset is not None:
+            m.d.comb += result.rst.eq(sourceReset)
+        m.domains += result
+        return result
 
     def elaborate(self, platform: Platform) -> Module:
         m = Module()
@@ -52,41 +68,21 @@ class TheCradle(Elaboratable):
         ### Main pll and clocks
         m.submodules.mainPll = mainPll = PllInstance(mainPllParameters)
 
-        domDviLink = ClockDomain(
-            "dviLink", local=True
-        )  # for the shift registers receiving TMDS encoded data
-        m.d.comb += domDviLink.clk.eq(mainPll.clkout0)
-        m.domains += domDviLink
-
-        domTheCradle = ClockDomain(
-            "theCradle", local=True
-        )  # save for later, unused now
-        m.d.comb += domTheCradle.clk.eq(mainPll.clkout1)
-        m.domains += domTheCradle
-
-        domPixel = ClockDomain(
-            "pixel", local=True
-        )  # for the TMDS encoder and the pixel source.
-        m.d.comb += domPixel.clk.eq(mainPll.clkout2)
-        m.domains += domPixel
-
-        domCpuBase = ClockDomain(
-            "cpuBase", local=True
-        )  # base for clocking the external CPU, unused now
-        m.d.comb += domCpuBase.clk.eq(mainPll.clkout3)
-        m.domains += domCpuBase
+        for dmn in mainPllClockMap:
+            print(
+                f"generating clock domain '{dmn}' using 'clkout{mainPllClockMap[dmn]}'..."
+            )
+            self.createClockDomain(m, dmn, mainPll.ports()[mainPllClockMap[dmn]])
 
         ### Pixel sequencer -> hsync clock
-        m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("sync")(
+        m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("pixel")(
             Sequencer(pixelSequence)
         )
         hsync = Signal()
         m.d.comb += hsync.eq(pixelSequencer.steps[0])
         henable = pixelSequencer.steps[2]
 
-        domHsync = ClockDomain("hsync", local=True)
-        m.d.comb += domHsync.clk.eq(hsync)
-        m.domains += domHsync
+        self.createClockDomain(m, "hsync", hsync)
 
         ### Scanline sequencer -> vsync clock + video display enable
         m.submodules.scanlineSequencer = scanlineSequencer = DomainRenamer("hsync")(
@@ -102,28 +98,23 @@ class TheCradle(Elaboratable):
         hsyncActive = Signal()  # Hsync pulse only for lines with displayable area
         m.d.comb += hsyncActive.eq(venable & hsync)
 
-        domVsync = ClockDomain("vsync", local=True)
-        m.d.comb += domVsync.clk.eq(vsync)
-        m.domains += domVsync
+        self.createClockDomain(m, "vsync", vsync)
 
-        domHsyncActive = ClockDomain(
-            "hsyncActive", local=True
-        )  # in effect, serves to clock a counter of displayed line, reset at each vbl.
-        m.d.comb += [domHsyncActive.clk.eq(hsyncActive), domHsyncActive.rst.eq(vsync)]
-        m.domains += domHsyncActive
+        self.createClockDomain(m, "hsyncActive", hsyncActive, vsync)
 
         ### The pixel source
         videoSource = videoSolidBlink = Signal(
             24
         )  # v[0:8] = blue, v[8:16] = green, v[16:24] = blue
-        m.submodules.beat = beat = SlowBeat(1)
-        m.d.comb += videoSolidBlink.eq(Mux(beat.beat_p, 0x0055AA, 0xAA9955))
         red, green, blue = Signal(8), Signal(8), Signal(8)
         m.d.comb += [
             blue.eq(videoSource[0:8]),
             green.eq(videoSource[8:16]),
             red.eq(videoSource[16:24]),
         ]
+
+        m.submodules.beat = beat = SlowBeat(1)
+        m.d.comb += videoSolidBlink.eq(Mux(beat.beat_p, 0x0055AA, 0xAA9955))
 
         ### The dvi link
         ctl0, ctl1, ctl2, ctl3 = Signal(), Signal(), Signal(), Signal()
@@ -138,14 +129,14 @@ class TheCradle(Elaboratable):
             greenTmds,
             redTmds,
         ) = (
-            DomainRenamer("sync")(DviTmdsEncoder(blue, vde, hsync, vsync)),
-            DomainRenamer("sync")(DviTmdsEncoder(green, vde, ctl0, ctl1)),
-            DomainRenamer("sync")(DviTmdsEncoder(red, vde, ctl2, ctl3)),
+            DomainRenamer("pixel")(DviTmdsEncoder(blue, vde, hsync, vsync)),
+            DomainRenamer("pixel")(DviTmdsEncoder(green, vde, ctl0, ctl1)),
+            DomainRenamer("pixel")(DviTmdsEncoder(red, vde, ctl2, ctl3)),
         )
 
         channelClockSource = Signal(10)
-        m.d.comb += channelClockSource.eq(0b1111100000)
-        # m.d.comb += channelClockSource.eq(0b0000011111)
+        # m.d.comb += channelClockSource.eq(0b1111100000)
+        m.d.comb += channelClockSource.eq(0b0000011111)
         (
             m.submodules.channel0,
             m.submodules.channel1,

@@ -15,10 +15,10 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with Sporniket's "The Cradle for MuseLab's Colorlight i9" project.
-If not, see <https://www.gnu.org/licenses/>. 
+If not, see <https://www.gnu.org/licenses/>.
 ---
 """
-## pll parameters to get the frequencies [250, 125, 25, 83]MHz
+## pll parameters to get the frequencies [125, 250, 25, 83]MHz
 mainPllParameters = {
     "p_PLLRST_ENA": "DISABLED",
     "p_INTFB_WAKE": "DISABLED",
@@ -30,30 +30,31 @@ mainPllParameters = {
     "p_OUTDIVIDER_MUXD": "DIVD",
     "p_CLKI_DIV": 1,
     "p_CLKOP_ENABLE": "ENABLED",
-    "p_CLKOP_DIV": 2,
-    "p_CLKOP_CPHASE": 0,
+    "p_CLKOP_DIV": 4,
+    "p_CLKOP_CPHASE": 3,
     "p_CLKOP_FPHASE": 0,
     "p_CLKOS_ENABLE": "ENABLED",
-    "p_CLKOS_DIV": 4,
-    "p_CLKOS_CPHASE": 0,
+    "p_CLKOS_DIV": 2,
+    "p_CLKOS_CPHASE": 1,
     "p_CLKOS_FPHASE": 0,
     "p_CLKOS2_ENABLE": "ENABLED",
     "p_CLKOS2_DIV": 20,
     "p_CLKOS2_CPHASE": 0,
-    "p_CLKOS2_FPHASE": 0,
+    # "p_CLKOS2_FPHASE": 0,
     "p_CLKOS3_ENABLE": "ENABLED",
-    "p_CLKOS3_DIV": 16,
-    "p_CLKOS3_CPHASE": 0,
-    "p_CLKOS3_FPHASE": 0,
+    "p_CLKOS3_DIV": 0,
+    "p_CLKOS3_CPHASE": 5,
+    # "p_CLKOS3_FPHASE": 0,
     "p_FEEDBK_PATH": "CLKOP",
-    "p_CLKFB_DIV": 10,
+    "p_CLKFB_DIV": 5,
+    ###
     "i_RST": 0,
     "i_STDBY": 0,
     "i_PHASESEL0": 0,
     "i_PHASESEL1": 0,
-    "i_PHASEDIR": 1,
-    "i_PHASESTEP": 1,
-    "i_PHASELOADREG": 1,
+    "i_PHASEDIR": 0,
+    "i_PHASESTEP": 0,
+    # "i_PHASELOADREG": 1,
     "i_PLLWAKESYNC": 0,
     "i_ENCLKOP": 0,
     "i_ENCLKOS": 0,
@@ -61,10 +62,11 @@ mainPllParameters = {
     "i_ENCLKOS3": 0,
 }
 
+mainPllClockMap = {"dviLink": 1, "theCradle": 0, "pixel": 2, "cpuBase": 3}
+
 ## Video timings for 640x480@59.94
 ## sequence of pixels in a single scan line [sync, back porch, active, front porch]
 pixelSequence = [96, 48, 640, 16]  # total = 800
 
 ## sequence of scanlines in a video screen [sync, back porch, active, front porch]
 scanlineSequence = [2, 33, 480, 10]  # total = 525
-

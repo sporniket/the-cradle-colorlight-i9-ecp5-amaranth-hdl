@@ -15,7 +15,7 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License along with Sporniket's "The Cradle for MuseLab's Colorlight i9" project.
-If not, see <https://www.gnu.org/licenses/>. 
+If not, see <https://www.gnu.org/licenses/>.
 ---
 """
 ## pll parameters to get the frequencies [270, 108, 27, 31]MHz
@@ -58,10 +58,11 @@ mainPllParameters = {
     "i_ENCLKOP": 0,
 }
 
+mainPllClockMap = {"dviLink": 0, "theCradle": 1, "pixel": 2, "cpuBase": 3}
+
 ## Video timings for 720x576@50Hz
 ## sequence of pixels in a single scan line [sync, back porch, active, front porch]
 pixelSequence = [64, 68, 720, 12]  # total = 864
 
 ## sequence of scanlines in a video screen [sync, back porch, active, front porch]
 scanlineSequence = [5, 39, 576, 5]  # total = 625
-
