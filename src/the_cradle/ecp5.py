@@ -40,13 +40,13 @@ class PllInstance(Elaboratable):
         self.clkout3 = clkout3 = Signal()
         self.locked = locked = Signal()
         # the map of parameters
-        self.params = params + {
+        self.params = params | {
             "i_CLKI": clkin,
             "i_CLKFB": clkout0,
             "o_CLKOP": clkout0,
-            "o_CLKO": clkout,
-            "o_CLKO": clkout,
-            "o_CLKO": clkout,
+            "o_CLKOS": clkout1,
+            "o_CLKOS2": clkout2,
+            "o_CLKOS3": clkout3,
             "o_LOCK": locked,
         }
 
@@ -64,6 +64,6 @@ class PllInstance(Elaboratable):
         m = Module()
 
         pll = Instance("EHXPLLL", **self.params)
-        m.submodules.pll += pll
+        m.submodules.pll = pll
 
         return m

@@ -28,7 +28,12 @@ from amaranth.build import Platform
 ### project deps
 from .blinky import Blinky
 from .ecp5 import PllInstance
-from amaranth_stuff.modules import Sequencer
+from amaranth_stuff.modules import (
+    Sequencer,
+    SlowBeat,
+    ShiftRegisterSendLsbFirst,
+    DviTmdsEncoder,
+)
 
 ## pll parameters to get the frequencies [270, 108, 27, 31]MHz
 mainPllParameters = {
@@ -104,18 +109,19 @@ class TheCradle(Elaboratable):
         domPixel = ClockDomain(
             "pixel", local=True
         )  # for the TMDS encoder and the pixel source.
-        m.d.comb += domPixel.clk.eq(mainPll.clkout2, local=True)
+        m.d.comb += domPixel.clk.eq(mainPll.clkout2)
 
         domCpuBase = ClockDomain(
             "cpuBase", local=True
         )  # base for clocking the external CPU, unused now
-        m.d.comb += domCpuBase.clk.eq(mainPll.clkout3, local=True)
+        m.d.comb += domCpuBase.clk.eq(mainPll.clkout3)
 
         ### Pixel sequencer -> hsync clock
         m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("pixel")(
             Sequencer(pixelSequence)
         )
-        hsync = pixelSequencer.steps[0]
+        hsync = Signal()
+        m.d.comb += hsync.eq(pixelSequencer.steps[0])
         henable = pixelSequencer.steps[2]
 
         domHsync = ClockDomain("hsync", local=True)
@@ -125,7 +131,8 @@ class TheCradle(Elaboratable):
         m.submodules.scanlineSequencer = scanlineSequencer = DomainRenamer("hsync")(
             Sequencer(scanlineSequence)
         )
-        vsync = scanlineSequencer.steps[0]
+        vsync = Signal()
+        m.d.comb += vsync.eq(scanlineSequencer.steps[0])
         venable = scanlineSequencer.steps[2]
 
         vde = Signal()
@@ -146,19 +153,31 @@ class TheCradle(Elaboratable):
         videoSource = videoSolidBlink = Signal(
             24
         )  # v[0:8] = blue, v[8:16] = green, v[16:24] = blue
-        m.d.comb += videoSolidBlink.eq(
-            Mux(blinky.submodules.beat.beat_p, 0x0055AA, 0xAA9955)
-        )
+        m.submodules.beat = beat = SlowBeat(1)
+        m.d.comb += videoSolidBlink.eq(Mux(beat.beat_p, 0x0055AA, 0xAA9955))
+        red, green, blue = Signal(8), Signal(8), Signal(8)
+        m.d.comb += [
+            blue.eq(videoSource[0:8]),
+            green.eq(videoSource[8:16]),
+            red.eq(videoSource[16:24]),
+        ]
 
         ### The dvi link
+        ctl0, ctl1, ctl2, ctl3 = Signal(), Signal(), Signal(), Signal()
+        m.d.comb += [
+            ctl0.eq(0),
+            ctl1.eq(0),
+            ctl2.eq(0),
+            ctl3.eq(0),
+        ]
         m.submodules.blueTmds, m.submodules.greenTmds, m.submodules.redTmds = (
             blueTmds,
             greenTmds,
             redTmds,
         ) = (
-            DomainRenamer("pixel")(DviTmdsEncoder(videoSource[0:8], vde, hsync, vsync)),
-            DomainRenamer("pixel")(DviTmdsEncoder(videoSource[8:16], vde, 0, 0)),
-            DomainRenamer("pixel")(DviTmdsEncoder(videoSource[16:24], vde, 0, 0)),
+            DomainRenamer("pixel")(DviTmdsEncoder(blue, vde, hsync, vsync)),
+            DomainRenamer("pixel")(DviTmdsEncoder(green, vde, ctl0, ctl1)),
+            DomainRenamer("pixel")(DviTmdsEncoder(red, vde, ctl2, ctl3)),
         )
 
         (
@@ -167,11 +186,11 @@ class TheCradle(Elaboratable):
             m.submodules.channel2,
             m.submodules.channelClock,
         ) = (channel0, channel1, channel2, channelClock) = (
-            DomainRenamer("dviLink")(ShiftRegisterTx(blueTmds.ports[-1])),
-            DomainRenamer("dviLink")(ShiftRegisterTx(greenTmds.ports[-1])),
-            DomainRenamer("dviLink")(ShiftRegisterTx(redTmds.ports[-1])),
+            DomainRenamer("dviLink")(ShiftRegisterSendLsbFirst(blueTmds.ports()[-1])),
+            DomainRenamer("dviLink")(ShiftRegisterSendLsbFirst(greenTmds.ports()[-1])),
+            DomainRenamer("dviLink")(ShiftRegisterSendLsbFirst(redTmds.ports()[-1])),
             DomainRenamer("dviLink")(
-                ShiftRegisterTx(Signal(unsigned(10), reset=0b0000011111))
+                ShiftRegisterSendLsbFirst(Signal(unsigned(10), reset=0b0000011111))
             ),
         )
 
