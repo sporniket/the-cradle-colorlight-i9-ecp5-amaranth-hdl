@@ -38,13 +38,12 @@ from amaranth_stuff.modules import (
 )
 
 from .vid_settings_640x480_59Hz94 import (
+    # from .vid_settings_720x576_50Hz import (
     mainPllParameters,
     mainPllClockMap,
     pixelSequence,
     scanlineSequence,
 )
-
-# from .vid_settings_720x576_50Hz import mainPllParameters, pixelSequence, scanlineSequence
 
 
 class TheCradle(Elaboratable):
