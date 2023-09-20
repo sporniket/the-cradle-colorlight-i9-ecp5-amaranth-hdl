@@ -23,7 +23,7 @@ from typing import List  # , Dict, Tuple, Optional
 
 ### amaranth -- main deps
 from amaranth import *
-from amaranth.build import Platform
+from amaranth.build import Platform, Resource, Pins, Attrs
 
 ### project deps
 from .blinky import Blinky
@@ -49,6 +49,27 @@ class TheCradle(Elaboratable):
     def __init__(self):
         pass
 
+    def setupGpios(self, platform: Platform):
+        """Demonstrate how to setup some pins of the platform
+
+        Args:
+            platform (Platform): the platform to update.
+        """
+
+        for gpioIndex, targetPinIndex in enumerate(
+            (5, 7, 9, 11, 13, 17, 23, 25, 27, 29)
+        ):
+            # retrieve the targeted pin
+            pin_name = platform.connectors["p", 2].mapping[str(targetPinIndex)]
+            print(f"pin name = {pin_name}")
+
+            # setup pin as resource
+            res = Resource("my_gpio", gpioIndex, Pins(pin_name, dir="o"))
+            res.attrs.update(Attrs(IO_TYPE="LVCMOS33", DRIVE="4"))
+
+            # append resource into platform
+            platform.add_resources([res])
+
     def createClockDomain(
         self, m: Module, name: str, sourceClock, sourceReset=None
     ) -> ClockDomain:
@@ -60,6 +81,7 @@ class TheCradle(Elaboratable):
         return result
 
     def elaborate(self, platform: Platform) -> Module:
+        self.setupGpios(platform)
         m = Module()
 
         ## Setup blinky : shows that the fpga is running
@@ -73,6 +95,13 @@ class TheCradle(Elaboratable):
                 f"generating clock domain '{dmn}' using 'clkout{mainPllClockMap[dmn]}'..."
             )
             self.createClockDomain(m, dmn, mainPll.ports()[mainPllClockMap[dmn]])
+
+        ### Setup probe blinkies
+        m.submodules.blinky0 = DomainRenamer("dviLink")(Blinky("my_gpio", 0))
+        m.submodules.blinky1 = DomainRenamer("theCradle")(Blinky("my_gpio", 1))
+        m.submodules.blinky2 = DomainRenamer("pixel")(Blinky("my_gpio", 2))
+        m.submodules.blinky3 = DomainRenamer("cpuBase")(Blinky("my_gpio", 3))
+        m.submodules.blinky5 = Blinky("my_gpio", 4)  # Witness
 
         ### Pixel sequencer -> hsync clock
         m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("pixel")(

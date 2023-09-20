@@ -35,10 +35,14 @@ class Blinky(Elaboratable):
 
     Striped down version of the amaranth-board 'blinky'."""
 
+    def __init__(self, resourceName: str = "led", resourceIndex: int = 0):
+        self.resourceName = resourceName
+        self.resourceIndex = resourceIndex
+
     def elaborate(self, platform: Platform) -> Module:
         m = Module()
 
-        led = platform.request("led", 0)
+        led = platform.request(self.resourceName, self.resourceIndex)
         m.submodules.beat = beat = SlowBeat(1)
 
         m.d.comb += led.eq(beat.beat_p)
