@@ -33,6 +33,8 @@ from amaranth_stuff.modules import (
     SlowBeat,
     ShiftRegisterSendLsbFirst,
     DviTmdsEncoder,
+    RippleCounter,
+    SlowRippleCounter,
 )
 
 from .vid_settings_640x480_59Hz94 import (
@@ -97,11 +99,57 @@ class TheCradle(Elaboratable):
             self.createClockDomain(m, dmn, mainPll.ports()[mainPllClockMap[dmn]])
 
         ### Setup probe blinkies
-        m.submodules.blinky0 = DomainRenamer("dviLink")(Blinky("my_gpio", 0))
-        m.submodules.blinky1 = DomainRenamer("theCradle")(Blinky("my_gpio", 1))
-        m.submodules.blinky2 = DomainRenamer("pixel")(Blinky("my_gpio", 2))
-        m.submodules.blinky3 = DomainRenamer("cpuBase")(Blinky("my_gpio", 3))
-        m.submodules.blinky5 = Blinky("my_gpio", 4)  # Witness
+        # m.submodules.blinky0 = Blinky("my_gpio", 0)  # Witness
+
+        ## Ripple counters setup
+        # reference : default clock
+        m.submodules.rc0 = rc0 = RippleCounter(8)
+        m.submodules.rc1 = rc1 = SlowRippleCounter(8)
+        m.submodules.rc2 = rc2 = SlowRippleCounter(8)
+        m.submodules.rc3 = rc3 = SlowRippleCounter(8)
+        m.d.comb += [
+            rc1.beat.eq(rc0.value[7]),
+            rc2.beat.eq(rc1.value[7]),
+            rc3.beat.eq(rc2.value[7]),
+        ]
+
+        # toProbe = "dviLink"
+        # toProbe = "theCradle"
+        toProbe = "pixel"
+        # toProbe = "cpuBase"
+        m.submodules.rc4 = rc4 = DomainRenamer(toProbe)(RippleCounter(8))
+        m.submodules.rc5 = rc5 = DomainRenamer(toProbe)(SlowRippleCounter(8))
+        m.submodules.rc6 = rc6 = DomainRenamer(toProbe)(SlowRippleCounter(8))
+        m.submodules.rc7 = rc7 = DomainRenamer(toProbe)(SlowRippleCounter(8))
+        m.d.comb += [
+            rc5.beat.eq(rc4.value[7]),
+            rc6.beat.eq(rc5.value[7]),
+            rc7.beat.eq(rc6.value[7]),
+        ]
+
+        # link to leds
+        gpio = platform.request("my_gpio", 0)
+        m.d.comb += gpio.eq(rc0.value[7])
+        gpio = platform.request("my_gpio", 2)
+        m.d.comb += gpio.eq(rc1.value[7])
+        gpio = platform.request("my_gpio", 4)
+        m.d.comb += gpio.eq(rc2.value[7])
+        gpio = platform.request("my_gpio", 6)
+        m.d.comb += gpio.eq(rc3.value[7])
+
+        gpio = platform.request("my_gpio", 1)
+        m.d.comb += gpio.eq(rc4.value[7])
+        gpio = platform.request("my_gpio", 3)
+        m.d.comb += gpio.eq(rc5.value[7])
+        gpio = platform.request("my_gpio", 5)
+        m.d.comb += gpio.eq(rc6.value[7])
+        gpio = platform.request("my_gpio", 7)
+        m.d.comb += gpio.eq(rc7.value[7])
+
+        # m.submodules.blinky0 = DomainRenamer("dviLink")(Blinky("my_gpio", 0))
+        # m.submodules.blinky1 = DomainRenamer("theCradle")(Blinky("my_gpio", 1))
+        # m.submodules.blinky2 = DomainRenamer("pixel")(Blinky("my_gpio", 2))
+        # m.submodules.blinky3 = DomainRenamer("cpuBase")(Blinky("my_gpio", 3))
 
         ### Pixel sequencer -> hsync clock
         m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("pixel")(
