@@ -72,9 +72,9 @@ class TheCradle(Elaboratable):
             platform.add_resources([res])
 
     def createClockDomain(
-        self, m: Module, name: str, sourceClock, sourceReset=None
+        self, m: Module, name: str, sourceClock, sourceReset=None, *, isLocal=True
     ) -> ClockDomain:
-        result = ClockDomain(name, local=True)
+        result = ClockDomain(name, local=isLocal)
         m.d.comb += result.clk.eq(sourceClock)
         if sourceReset is not None:
             m.d.comb += result.rst.eq(sourceReset)
@@ -95,7 +95,9 @@ class TheCradle(Elaboratable):
             print(
                 f"generating clock domain '{dmn}' using 'clkout{mainPllClockMap[dmn]}'..."
             )
-            self.createClockDomain(m, dmn, mainPll.ports()[mainPllClockMap[dmn]])
+            self.createClockDomain(
+                m, dmn, mainPll.ports()[mainPllClockMap[dmn] + 1], isLocal=False
+            )
 
         ### Setup probe blinkies
         # m.submodules.blinky0 = Blinky("my_gpio", 0)  # Witness
@@ -112,9 +114,9 @@ class TheCradle(Elaboratable):
             rc3.beat.eq(rc2.value[7]),
         ]
 
-        # toProbe = "dviLink"
+        toProbe = "dviLink"
         # toProbe = "theCradle"
-        toProbe = "pixel"
+        # toProbe = "pixel"
         # toProbe = "cpuBase"
         m.submodules.rc4 = rc4 = DomainRenamer(toProbe)(RippleCounter(8))
         m.submodules.rc5 = rc5 = DomainRenamer(toProbe)(SlowRippleCounter(8))
