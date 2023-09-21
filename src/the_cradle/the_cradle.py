@@ -91,6 +91,9 @@ class TheCradle(Elaboratable):
         ### Main pll and clocks
         m.submodules.mainPll = mainPll = PllInstance(mainPllParameters)
 
+        # !!! DO NOT FORGET !!! --> modify PllInstance
+        m.d.comb += mainPll.clkin.eq(ClockSignal())
+
         for dmn in mainPllClockMap:
             print(
                 f"generating clock domain '{dmn}' using 'clkout{mainPllClockMap[dmn]}'..."
@@ -149,10 +152,10 @@ class TheCradle(Elaboratable):
 
         # direct output, to scope the signals
         gpio = platform.request("my_gpio", 8)
-        m.d.comb += gpio.eq(mainPll.clkout2) # GOT 1.35 MHz
+        m.d.comb += gpio.eq(mainPll.clkout2)  # GOT 1.35 MHz
 
         gpio = platform.request("my_gpio", 9)
-        m.d.comb += gpio.eq(mainPll.clkout3) # GOT 1.69 MHz
+        m.d.comb += gpio.eq(mainPll.clkout3)  # GOT 1.69 MHz
 
         # m.submodules.blinky0 = DomainRenamer("dviLink")(Blinky("my_gpio", 0))
         # m.submodules.blinky1 = DomainRenamer("theCradle")(Blinky("my_gpio", 1))
