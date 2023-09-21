@@ -149,10 +149,10 @@ class TheCradle(Elaboratable):
 
         # direct output, to scope the signals
         gpio = platform.request("my_gpio", 8)
-        m.d.comb += gpio.eq(mainPll.clkout2)
+        m.d.comb += gpio.eq(mainPll.clkout2) # GOT 1.35 MHz
 
         gpio = platform.request("my_gpio", 9)
-        m.d.comb += gpio.eq(mainPll.clkout3)
+        m.d.comb += gpio.eq(mainPll.clkout3) # GOT 1.69 MHz
 
         # m.submodules.blinky0 = DomainRenamer("dviLink")(Blinky("my_gpio", 0))
         # m.submodules.blinky1 = DomainRenamer("theCradle")(Blinky("my_gpio", 1))
