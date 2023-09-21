@@ -39,10 +39,12 @@ class PllInstance(Elaboratable):
         self.clkout2 = clkout2 = Signal()
         self.clkout3 = clkout3 = Signal()
         self.locked = locked = Signal()
+        self.intfb = intfb = Signal()
         # the map of parameters
         self.params = params | {
             "i_CLKI": clkin,
-            "i_CLKFB": clkout0,
+            "i_CLKFB": intfb,
+            "o_CLKINTFB": intfb,
             "o_CLKOP": clkout0,
             "o_CLKOS": clkout1,
             "o_CLKOS2": clkout2,
