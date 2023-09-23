@@ -73,7 +73,9 @@ class TheCradle(Elaboratable):
             print(
                 f"generating clock domain '{dmn}' using 'clkout{mainPllClockMap[dmn]}'..."
             )
-            self.createClockDomain(m, dmn, mainPll.outputClockPorts()[mainPllClockMap[dmn]])
+            self.createClockDomain(
+                m, dmn, mainPll.outputClockPorts()[mainPllClockMap[dmn]]
+            )
 
         ### Pixel sequencer -> hsync clock
         m.submodules.pixelSequencer = pixelSequencer = DomainRenamer("pixel")(
