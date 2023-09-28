@@ -3,4 +3,5 @@
 echo "Cleaning..."
 rm -Rf tmp.test_* 2>&1 >/dev/null
 rm dist/* 2>&1 >/dev/null
+rm build/* 2>&1 >/dev/null
 rm -Rf .pytest_cache htmlcov .coverage 2>&1 >/dev/null
