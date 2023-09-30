@@ -41,6 +41,6 @@ class Blinky(Elaboratable):
         led = platform.request("led", 0)
         m.submodules.beat = beat = SlowBeat(1)
 
-        m.d.comb += led.eq(beat.beat_p)
+        m.d.comb += led.o.eq(beat.beat_p)
 
         return m
