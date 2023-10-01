@@ -40,6 +40,15 @@ class Deployer:
         print(
             f"========================[ START OF Deployment ]============================"
         )
+        print(
+            """
+The file 'build/top.bit' will be created and deployed onto the colorlight.
+
+The actual deployment into the colorlight assume that openFPGALoader is present, otherwise
+you will have to do it manually with another tool (like ecpdap).
+
+        """
+        )
         self.endpoint.build(self.payload, do_program=True)
         print(f"-- -- -- -- -- -- -- -- [ END OF Deployment ] -- -- -- -- -- -- -- --")
 

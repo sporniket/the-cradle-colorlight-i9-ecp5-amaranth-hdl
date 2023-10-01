@@ -90,10 +90,6 @@ class Colorlight_I9_V7_2_Platform(LatticeECP5Platform):
         ),
     ]
 
-    @property
-    def required_tools(self):
-        return super().required_tools + ["openFPGALoader"]
-
     def toolchain_prepare(self, fragment, name, **kwargs):
         overrides = dict(ecppack_opts="--compress")
         overrides.update(kwargs)
