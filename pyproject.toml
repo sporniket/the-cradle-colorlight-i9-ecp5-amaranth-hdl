@@ -25,7 +25,7 @@ classifiers = [
     "Environment :: Console",
 ]
 dependencies = [
-    'amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@a738ace61839390dfdaa8ef06baa17d32482d771',
+    'amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@6aa883965a68c156c373bc7442eea550134c7f50',
     'importlib-metadata; python_version>"3.8"',
 ]
 
@@ -34,3 +34,52 @@ homepage = "https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-
 #TODO documentation = "https://readthedocs.org"
 repository = "https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl.git"
 bug-tracker = "https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl/issues"
+
+[tool.pdm.scripts]
+_.env_file = ".env.toolchain"
+# --- bleeding edge dependencies update ---
+display-dependency-updates = "python3 display-dependency-updates.py"
+# --- cleaning
+_clean_tons_of_files = "python3 reclean.py"
+clean = { composite = [ "_clean_tons_of_files" ] }
+# --- linting ---
+reformat = "python3 -m black ."
+_lint_errors = "python3 -m flake8 src --count --select=E9,F63,F7,F82 --show-source --statistics"
+_lint_warnings = "python3 -m flake8 src --count --ignore=E266 --exit-zero --max-complexity=10 --max-line-length=127 --statistics"
+lint_report = { composite = [ "_lint_errors", "_lint_warnings" ] }
+lint_ci = { composite = [ "reformat", "_lint_errors" ] }
+lint = { composite = [ "reformat", "lint_report" ] }
+# --- building ---
+make_bitstream = "python3 -m the_cradle.builder"
+deploy_with_openfpgaloader = "openFPGALoader -c cmsisdap -m ./build/top.bit"
+make_and_deploy_ofl = { composite = ["clean", "make_bitstream", "deploy_with_openfpgaloader"] }
+# the default 'make and deploy' will use openFPGALoader.
+make_and_deploy = { composite = ["make_and_deploy_ofl"] }
+# --- test & coverage ---
+_coverage_run = "python3 -m coverage run --source=ecp5 --branch -m pytest"
+_coverage_report = "python3 -m coverage report -m"
+_coverage_html = "python3 -m coverage html"
+_ci_only = { composite = ["_coverage_run","_coverage_report","_coverage_html"] }
+ci = { composite = ["clean", "lint_ci", "_ci_only"] }
+
+[tool.pdm.dev-dependencies]
+lint = [
+    "black>=23.9.1",
+    "flake8>=6.1.0",
+]
+ci = [
+    "pytest>=7.4.2",
+    "coverage>=7.3.2",
+    "yowasp-yosys>=0.34.0.0.post591",
+]
+scripting = [
+    "rich>=13.6.0",
+]
+build = [
+    "pdm>=2.9.3",
+    "pytest>=7.4.2",
+    "twine>=4.0.2",
+]
+ecp5 = [
+    "yowasp-nextpnr-ecp5>=0.6.0.0.post445",
+]

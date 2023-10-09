@@ -39,15 +39,13 @@ Content
 
 **The Cradle for MuseLab's Colorlight i9 by Sporniket** requires a set of tools to build and deploy to an actual Colorlight i9 board :
 
-* **Python 3.10 and pip** ; then the script `repip` will invoke pip to install supplemental modules.
-* [Yosys (mandatory components and boolector)](https://symbiyosys.readthedocs.io/en/latest/install.html), [PrjTrellis](https://github.com/YosysHQ/prjtrellis), [nextpnr-ecp5](https://github.com/YosysHQ/nextpnr) and [openFPGALoader](https://github.com/trabucayre/openFPGALoader).
-
-I wrote [a little log of what I did to get my workstation up and running](https://medium.com/@sporniket.studio/setting-up-the-computer-ubuntu-linux-my-journey-with-the-amaranth-hdl-fc789c766670).
-
-Other python dependencies are pulled when launching the automated tests with `retest` or uploading the generated gateware using `redeploy` :
-* [amaranth-stuff](https://github.com/sporniket/amaranth-stuff), notably contains the TMDS encoder.
+* To build the bitstream : **Python 3.10 or later up to 3.12, pip and pdm** ; then all the dependencies required to generate the bitstream are pulled by pdm ; the most essential with regard to designing hardware logic and building the bitstream for the ECP5 FPGA :
   * [amaranth](https://github.com/amaranth-lang/amaranth).
   * [amaranth-boards](https://github.com/amaranth-lang/amaranth-boards).
+  * [amaranth-stuff](https://github.com/sporniket/amaranth-stuff), notably contains the TMDS encoder.
+  * Some tools from the [Unofficial WebAssembly-based packages for Yosys, nextpnr, and more](http://yowasp.org/) : yowasp-yosys and yowasp-nextpnr-ecp5
+
+* to upload the bitstream, you will need a tool to perform this task (like [openFPGALoader](https://github.com/trabucayre/openFPGALoader) or [ecpdap](https://github.com/adamgreig/ecpdap)). This project provides a pdm script to use [openFPGALoader](https://github.com/trabucayre/openFPGALoader).
 
 > Do not use **The Cradle for MuseLab's Colorlight i9 by Sporniket** if this project is not suitable for your project
 
@@ -55,12 +53,22 @@ Other python dependencies are pulled when launching the automated tests with `re
 
 ### From source
 
-> Once the required tools have been installed, and the colorlight i9 is plugged to your computer.
+> To build the bitstream only.
 
-	git clone https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl.git
-	cd the-cradle-colorlight-i9-ecp5-amaranth-hdl
-    ./repip 
-    ./redeploy
+```
+git clone https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl.git
+cd the-cradle-colorlight-i9-ecp5-amaranth-hdl
+python3 -m pdm sync
+python3 -m pdm run make_bitstream
+```
+
+Then upload the bitstream file `build/top.bit` into the ECP5 with your favorite tool. 
+
+> If you have installed _openFPGALoader_, and with the Colorlight board plugged in : 
+
+```
+python3 -m pdm run make_and_deploy
+```
 
 ## 4. Known issues
 See the [project issues](https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl/issues) page.

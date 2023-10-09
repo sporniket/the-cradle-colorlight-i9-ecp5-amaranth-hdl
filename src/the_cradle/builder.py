@@ -31,27 +31,29 @@ from .colorlight_i9 import Colorlight_I9_V7_2_Platform
 from .the_cradle import TheCradle
 
 
-class Deployer:
+class Builder:
     def __init__(self, endpoint: Platform, payload: Elaboratable):
         self.endpoint = endpoint
         self.payload = payload
 
-    def deploy(self):
-        print(
-            f"========================[ START OF Deployment ]============================"
-        )
+    def build(self):
+        print(f"========================[ START OF Build ]============================")
         print(
             """
-The file 'build/top.bit' will be created and deployed onto the colorlight.
+The file 'build/top.bit' will be the bitstream to upload to the ECP5. 
+The file 'build/top.tim' will contains nextpnr logs
 
-The actual deployment into the colorlight assume that openFPGALoader is present, otherwise
-you will have to do it manually with another tool (like ecpdap).
+To deploy on the colorlight :
+* with openFPGALoader : openFPGALoader -c cmsisdap -m build/top.bit
+* with ecpdap : ecpdap program build/top.bit -f10M (? to be tested)
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
         """
         )
-        self.endpoint.build(self.payload, do_program=True)
-        print(f"-- -- -- -- -- -- -- -- [ END OF Deployment ] -- -- -- -- -- -- -- --")
+        self.endpoint.build(self.payload, do_program=False)
+        print(f"-- -- -- -- -- -- -- -- [ END OF Build ] -- -- -- -- -- -- -- --")
 
 
 if __name__ == "__main__":
-    Deployer(Colorlight_I9_V7_2_Platform(), TheCradle()).deploy()
+    Builder(Colorlight_I9_V7_2_Platform(), TheCradle()).build()
