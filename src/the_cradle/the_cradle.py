@@ -108,7 +108,7 @@ class TheCradle(Elaboratable):
         ### The pixel source
         videoSource = videoSolidBlink = Signal(
             24
-        )  # v[0:8] = blue, v[8:16] = green, v[16:24] = blue
+        )  # v[0:8] = blue, v[8:16] = green, v[16:24] = red
         red, green, blue = Signal(8), Signal(8), Signal(8)
         m.d.comb += [
             blue.eq(videoSource[0:8]),
