@@ -58,6 +58,12 @@ class VideoLineBuffer(Elaboratable):
         self.greenBuffer = Memory(8, 2048, red_content)
         self.blueBuffer = Memory(8, 2048, red_content)
 
+        # buffer state 
+        # displayLine
+        # -- 0 -> read line 0, write line 1
+        # -- 1 -> write line 0, read line 1
+        self.displayLine = Signal() 
+
     def elaborate(self, p: Platform) -> Module:
         m = Module()
 
@@ -84,5 +90,14 @@ class VideoLineBuffer(Elaboratable):
             greenWriter.data.eq(self.dataIn[8:16]),
             blueWriter.data.eq(self.dataIn[0:8]),
         ]
+
+        # I need a counter for scanning memory for output
+        # vidCounter = DomainRenamer(self.domainOfPixel)(ResetInserter(hsync)(EnableInserter(vde)(RippleCounter(10))))
+        # addrRead := Cat(vidCounter.value, self.displayLine)
+
+        # I need a counter for scanning memory for input
+        # writeCounter = DomainRenamer(self.domainOfMemory)(ResetInserter(switchStrobe)(EnableInserter(dataStrobe)(RippleCounter(10))))
+        # addrWrite := Cat(vidCounter.value, ~self.displayLine)
+
 
         return m
