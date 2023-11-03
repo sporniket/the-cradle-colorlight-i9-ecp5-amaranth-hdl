@@ -40,6 +40,9 @@ blue_content = [0xFF if i % 3 == 2 else 0 for i in range(0, 1024)] + [
 
 
 class VideoLineBuffer(Elaboratable):
+    WIDTH_OF_ADDRESS = 11
+    DEPTH_OF_MEMORY = 2**WIDTH_OF_ADDRESS
+
     def __init__(self, pixelDomain: str, memoryDomain: str):
         self.domainOfPixel = pixelDomain
         self.domainOfMemory = memoryDomain
@@ -54,9 +57,9 @@ class VideoLineBuffer(Elaboratable):
         self.videoDisplayEnable = Signal()
 
         # memory array
-        self.redBuffer = Memory(8, 2048, red_content)
-        self.greenBuffer = Memory(8, 2048, red_content)
-        self.blueBuffer = Memory(8, 2048, red_content)
+        self.redBuffer = Memory(8, DEPTH_OF_MEMORY, red_content)
+        self.greenBuffer = Memory(8, DEPTH_OF_MEMORY, green_content)
+        self.blueBuffer = Memory(8, DEPTH_OF_MEMORY, blue_content)
 
         # buffer state 
         # displayLine
@@ -67,12 +70,27 @@ class VideoLineBuffer(Elaboratable):
     def elaborate(self, p: Platform) -> Module:
         m = Module()
 
+        ### ===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===
+        # Registering submodules that can be instancied in advance
+        # -- from self
+        m.submodules.redBuffer = redBuffer = self.redBuffer
+        m.submodules.greenBuffer = greenBuffer  = self.greenBuffer
+        m.submodules.blueBuffer = blueBuffer = self.blueBuffer
+
+        # -- I need a counter for scanning memory for output
+        m.submodules.vidCounter = vidCounter = DomainRenamer(self.domainOfPixel)(ResetInserter(hsync)(EnableInserter(vde)(RippleCounter(10))))
+
+        # I need a counter for scanning memory for input
+        m.submodules.writeCounter = writeCounter = DomainRenamer(self.domainOfMemory)(ResetInserter(switchStrobe)(EnableInserter(dataStrobe)(RippleCounter(10))))
+
+        ### ===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===
         # wiring dataOut
-        # TODO -- have an address counter to be incremented on self.domainOfPixel (real clock), enabled by VDE and reset on HSYNC 
-        redReader = self.redBuffer.read_port(self.domainOfPixel)
-        greenReader = self.greenBuffer.read_port(self.domainOfPixel)
-        blueReader = self.blueBuffer.read_port(self.domainOfPixel)
+        addrRead = Signal(WIDTH_OF_ADDRESS)
+        redReader = redBuffer.read_port(self.domainOfPixel)
+        greenReader = greenBuffer.read_port(self.domainOfPixel)
+        blueReader = blueBuffer.read_port(self.domainOfPixel)
         m.d.comb += [
+            addrRead.eq(Cat(vidCounter.value, self.displayLine)),
             # always output value
             redReader.en.eq(Const(1)),
             greenReader.en.eq(Const(1)),
@@ -80,24 +98,27 @@ class VideoLineBuffer(Elaboratable):
             self.dataOut.eq(Cat(blueReader.data, greenReader.data, redReader.data))
         ]
 
+        ### ===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===-===
         # wiring dataIn
-        # TODO -- on dataStrobe asserted -> do write from dataIn, increment an address counter ; reset the counter on switchStrobe
-        redWriter = self.redBuffer.write_port(self.domainOfMemory)
-        greenWriter = self.greenBuffer.write_port(self.domainOfMemory)
-        blueWriter = self.blueBuffer.write_port(self.domainOfMemory)
+        addrWrite = Signal(WIDTH_OF_ADDRESS)
+        redWriter = redBuffer.write_port(self.domainOfMemory)
+        greenWriter = greenBuffer.write_port(self.domainOfMemory)
+        blueWriter = blueBuffer.write_port(self.domainOfMemory)
         m.d.comb += [
+            addrWrite.eq(Cat(vidCounter.value, ~self.displayLine)),
             redWriter.data.eq(self.dataIn[16:24]),
             greenWriter.data.eq(self.dataIn[8:16]),
             blueWriter.data.eq(self.dataIn[0:8]),
         ]
 
-        # I need a counter for scanning memory for output
-        # vidCounter = DomainRenamer(self.domainOfPixel)(ResetInserter(hsync)(EnableInserter(vde)(RippleCounter(10))))
-        # addrRead := Cat(vidCounter.value, self.displayLine)
+        ###
+        # TODO I need some signals to manage switchStrobe 
 
-        # I need a counter for scanning memory for input
-        # writeCounter = DomainRenamer(self.domainOfMemory)(ResetInserter(switchStrobe)(EnableInserter(dataStrobe)(RippleCounter(10))))
-        # addrWrite := Cat(vidCounter.value, ~self.displayLine)
+        # TODO When receiving switchStrobe : 
+        # * one should wait for the next leading edge of hsync
+        # * Then the switch is done, and the switchAcknowledge is asserted ;
+        # * Then switchStrobe is negated ;
+        # * Then switchAcknowledge is negated.
 
 
         return m
