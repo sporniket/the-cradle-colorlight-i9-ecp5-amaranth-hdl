@@ -25,7 +25,7 @@ classifiers = [
     "Environment :: Console",
 ]
 dependencies = [
-    'amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@6aa883965a68c156c373bc7442eea550134c7f50',
+    "git+https://github.com/sporniket/amaranth-stuff@v0.0.2",
     'importlib-metadata; python_version>"3.8"',
 ]
 
