@@ -30,7 +30,7 @@ from ecp5 import Ehxplll
 from .blinky import Blinky
 from amaranth_stuff.modules import (
     Sequencer,
-    SlowBeat,
+    RippleCounter,
     ShiftRegisterSendLsbFirst,
     DviTmdsEncoder,
 )
@@ -106,9 +106,9 @@ class TheCradle(Elaboratable):
         self.createClockDomain(m, "hsyncActive", hsyncActive, vsync)
 
         ### The pixel source
-        videoSource = videoSolidBlink = Signal(
+        videoSource = Signal(
             24
-        )  # v[0:8] = blue, v[8:16] = green, v[16:24] = blue
+        )  # v[0:8] = blue, v[8:16] = green, v[16:24] = red
         red, green, blue = Signal(8), Signal(8), Signal(8)
         m.d.comb += [
             blue.eq(videoSource[0:8]),
@@ -116,8 +116,12 @@ class TheCradle(Elaboratable):
             red.eq(videoSource[16:24]),
         ]
 
+        videoSolidBlink = Signal(24)
         m.submodules.beat = beat = DomainRenamer("vsync")(Sequencer([50, 50]))
         m.d.comb += videoSolidBlink.eq(Mux(beat.steps[0], 0x0055AA, 0xAA9955))
+
+        m.submodules.redGradient = redGradient = DomainRenamer("pixel")(ResetInserter(~vde)(RippleCounter(8)))
+        m.d.comb += videoSource.eq(Cat(videoSolidBlink[0:16], redGradient.value))
 
         ### The dvi link
         ctl0, ctl1, ctl2, ctl3 = Signal(), Signal(), Signal(), Signal()
