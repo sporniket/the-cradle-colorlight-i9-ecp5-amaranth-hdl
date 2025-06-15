@@ -29,6 +29,7 @@ from amaranth.build import Platform
 from ecp5 import Ehxplll
 from .blinky import Blinky
 from amaranth_stuff.modules import (
+    MonoImpulse,
     Sequencer,
     RippleCounter,
     ShiftRegisterSendLsbFirst,
@@ -101,9 +102,8 @@ class TheCradle(Elaboratable):
         hsyncActive = Signal()  # Hsync pulse only for lines with displayable area
         m.d.comb += hsyncActive.eq(venable & hsync)
 
-        self.createClockDomain(m, "vsync", vsync)
-
-        self.createClockDomain(m, "hsyncActive", hsyncActive, vsync)
+        m.submodules.vsyncPulseClock = vsyncPulseClock = DomainRenamer("pixel")(ResetInserter(~vsync)(MonoImpulse()))
+        m.submodules.hsyncPulseClock = hsyncPulseClock = DomainRenamer("pixel")(ResetInserter(~hsync)(MonoImpulse()))
 
         ### The pixel source
         videoSource = Signal(
@@ -117,11 +117,12 @@ class TheCradle(Elaboratable):
         ]
 
         videoSolidBlink = Signal(24)
-        m.submodules.beat = beat = DomainRenamer("vsync")(Sequencer([50, 50]))
+        m.submodules.beat = beat = DomainRenamer("pixel")(EnableInserter(vsyncPulseClock.dataOut)(Sequencer([50, 50])))
         m.d.comb += videoSolidBlink.eq(Mux(beat.steps[0], 0x0055AA, 0xAA9955))
 
         m.submodules.redGradient = redGradient = DomainRenamer("pixel")(ResetInserter(~vde)(RippleCounter(8)))
-        m.d.comb += videoSource.eq(Cat(videoSolidBlink[0:16], redGradient.value))
+        m.submodules.greenGradient = greenGradient = DomainRenamer("pixel")(ResetInserter(~venable)(EnableInserter(hsyncPulseClock.dataOut)(RippleCounter(8))))
+        m.d.comb += videoSource.eq(Cat(videoSolidBlink[0:8], greenGradient.value, redGradient.value))
 
         ### The dvi link
         ctl0, ctl1, ctl2, ctl3 = Signal(), Signal(), Signal(), Signal()

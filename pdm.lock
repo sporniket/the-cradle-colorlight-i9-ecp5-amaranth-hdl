@@ -5,7 +5,7 @@
 groups = ["default", "build", "ci", "ecp5", "lint", "scripting"]
 strategy = []
 lock_version = "4.5.0"
-content_hash = "sha256:d9650a2bd99424875184d3fdc72eb38253692bceec6786c65b3e8e39d665ea40"
+content_hash = "sha256:7747dc2f78b327c6220d9b9c11ec3efb94cbbc1972d19fe644f95544ff9eae8b"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -37,11 +37,11 @@ dependencies = [
 
 [[package]]
 name = "amaranth-stuff-by-sporniket"
-version = "0.0.2"
+version = "0.0.3"
 requires_python = ">=3.9"
 git = "https://github.com/sporniket/amaranth-stuff"
-ref = "v0.0.2"
-revision = "c459b1fd1525e810f3dde1b97bf6f73c852a0a27"
+ref = "v0.0.3"
+revision = "daf8985ed77a24808bf89ed7328e935ec58479ff"
 summary = "A curated collection of code written using the amaranth hdl"
 dependencies = [
     "amaranth-boards @ git+https://github.com/amaranth-lang/amaranth-boards@170675812b71ee722bcf8ccdb88409a9ad97ffe2",
@@ -70,6 +70,7 @@ ref = "c7da6c1292ea60a612ee9fd0f75d603485939580"
 revision = "c7da6c1292ea60a612ee9fd0f75d603485939580"
 summary = "Amaranth hardware definition language"
 dependencies = [
+    "amaranth @ git+https://github.com/amaranth-lang/amaranth@c7da6c1292ea60a612ee9fd0f75d603485939580",
     "amaranth @ git+https://github.com/amaranth-lang/amaranth@c7da6c1292ea60a612ee9fd0f75d603485939580",
     "amaranth @ git+https://github.com/amaranth-lang/amaranth@c7da6c1292ea60a612ee9fd0f75d603485939580",
     "amaranth @ git+https://github.com/amaranth-lang/amaranth@c7da6c1292ea60a612ee9fd0f75d603485939580",
@@ -145,6 +146,7 @@ extras = ["filecache"]
 requires_python = ">=3.7"
 summary = "httplib2 caching for requests"
 dependencies = [
+    "cachecontrol==0.13.1",
     "cachecontrol==0.13.1",
     "cachecontrol==0.13.1",
     "cachecontrol==0.13.1",

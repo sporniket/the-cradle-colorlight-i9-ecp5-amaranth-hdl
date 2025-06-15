@@ -1,0 +1,50 @@
+http://improwis.com/tables/video.webt
+PixClock <= 37 MHz
+TMDS clock <= 370 MHz
+
+C   VESA                  720x400@85.039     936    446      37.9274 - +      35.500       36    72  108      1    3   42        common X11 modelines; [ref]
+C   industry standard     640x480@60.00      800    525      31.5000 - -      25.200       16    96   48     10    2   33        common X11 modelines; Established Timing?
+c   VGA                   640x480@60.00      784    503      39.780  - -      24.823       24    48   72      1    3   19        fb.modes, VIA
+
+S   VIC=2 480p            720x480@59.940     858    525      31.4685          27.000                                             4:3  (pixel=8:9); EIA/CEA-861 standard; hdmi_mode=2
+S   VIC=3 480pH           720x480@59.940     858    525      31.4685          27.000                                             16:9 (pixel=32:27); EIA/CEA-861 standard; hdmi_mode=3
+S   CEA861 (v4l2)         720x480@59.940     858    525      31.4685 - -      27.000       16    62   60      9    6   30        linux/v4l2-dv-timings.h V4L2_DV_BT_CEA_720X480P59_94; IS_CE_VIDEO,HAS_PICTURE_ASPECT,HAS_CEA861_VIC
+T   EIA/CEA-861B          720x480@59.940     858    525      31.4685 - -      27.000       16    62   60      9    6   30        [ref]
+
+T   EIA/CEA-861B          720x480@60.000     858    525      31.5000 - -      27.027       16    62   60      9    6   30        [ref]
+e   many LPC processors   720x480@60.000     858    525      31.5000 + +      27.027       16    62   60      9    6   30        [ref]
+c   VGA VIA               720x480@60.24      896    498      30.000  +?+?     26.880       16    72   88      1    3   14        fb.modes, VIA
+S   CEA861 (v4l2)         720x480i@31.343    858    502      15.7343 - -      13.500       19    62   57      4    3   15 4 3 16 linux/v4l2-dv-timings.h V4L2_DV_BT_CEA_720X480I59_94; HALF_LINE,IS_CE_VIDEO,HAS_PICTURE_ASPECT,HAS_CEA861_VIC
+
+
+c   VGA VIA               800x480@60.00      992    500      29.7379 +?+?     29.500       24    72   96      3    7   10        fb.modes, VIA
+
+c   VGA VIA               848x480@60.00     1056    500      29.830  + +      31.5         24    80  104      3    5   12        fb.modes, VIA
+S   DMT (v4l2)            848x480@60        1088    517      31.0202 + +      33.750       16   112  112      6    8   23        linux/v4l2-dv-timings.h V4L2_DV_BT_DMT_848X480P60
+S   DMT v1.0 r11          848x480@60.000    1088    517      31.0202 + +      33.750       16   112  112      6    8   23        
+
+c   VGA VIA               856x480@60.00     1064    497      29.820  + +      31.728       16    88  104      1    3   13        fb.modes, VIA
+
+
+
+very limit : 
+c   CVT 0.52M9-R          960x540@59.82     1120    556      33.26   + -      37.25        48    32   80      3    5    8        x86 extramodes
+
+
+
+S   VIC=17 576p           720x576@50.000     864    625      31.25            27.000                                             4:3  (pixel=16:15); EIA/CEA-861 standard; hdmi_mode=17
+S   VIC=18 576pH          720x576@50.000     864    625      31.25            27.000                                             16:9 (pixel=64:45); EIA/CEA-861 standard; hdmi_mode=18
+S   CEA861 (v4l2)         720x576@50.0000    864    625      31.2500 - -      27.000       12    64   68      5    5   39        linux/v4l2-dv-timings.h V4L2_DV_BT_CEA_720X576P50; IS_CE_VIDEO,HAS_PICTURE_ASPECT,HAS_CEA861_VIC
+T   EIA/CEA-861B          720x576@50.0000    864    625      31.2500 - -      27.000       12    64   68      5    5   39        [ref]
+
+
+c   VGA VIA               720x576@60.00      912    597      35.820  +?+?     32.668       24    72   96      1    3   17        fb.modes, VIA
+
+
+C   GTF/VESA              768x576@59.999     976    597      35.8197 - +      34.960       24    80  104      1    3   17        common X11 modelines; VESA [ref]
+c   VGA GTF               768x576@60         976    597      35.82   - +      34.96        24    80  104      1    3   17        MHi modelines table
+
+
+C   SVGA/VESA             800x600@56.250    1024    625      35.1562 + +      36.000       24    72  128      1    2   22        common X11 modelines; Established Timing?; VESA [ref]
+
+
