@@ -36,16 +36,16 @@ from amaranth_stuff.modules import (
     DviTmdsEncoder,
 )
 
-# from .vid_settings_720x576_50Hz import (
-from .vid_settings_640x480_59Hz94 import (
+# from .vid_settings_640x480_59Hz94 import (
+# from .vid_settings_960x540_59Hz82 import (
+# from .vid_settings_800x600_56Hz25 import (
+# from .vid_settings_768x576_60Hz import (
+from .vid_settings_720x576_50Hz import (
     mainPllParameters,
     mainPllClockMap,
     pixelSequence,
     scanlineSequence,
 )
-
-# from .vid_settings_720x576_50Hz import mainPllParameters, pixelSequence, scanlineSequence
-
 
 class TheCradle(Elaboratable):
     def __init__(self):

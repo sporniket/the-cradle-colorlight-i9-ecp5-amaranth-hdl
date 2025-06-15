@@ -2,6 +2,11 @@ http://improwis.com/tables/video.webt
 PixClock <= 37 MHz
 TMDS clock <= 370 MHz
 
+                                                                              pixel     front       back   front       back
+                                            Htotal Vtotal     hsync   vsync   clock     porch hsync porch  porch vsync porch
+    mode       name      res                pixels lines      kHz  pol pol     MHz       pix   pix   pix   lines lines lines
+
+
 C   VESA                  720x400@85.039     936    446      37.9274 - +      35.500       36    72  108      1    3   42        common X11 modelines; [ref]
 C   industry standard     640x480@60.00      800    525      31.5000 - -      25.200       16    96   48     10    2   33        common X11 modelines; Established Timing?
 c   VGA                   640x480@60.00      784    503      39.780  - -      24.823       24    48   72      1    3   19        fb.modes, VIA
