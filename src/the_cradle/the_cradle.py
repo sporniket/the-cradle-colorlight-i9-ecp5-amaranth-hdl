@@ -40,7 +40,8 @@ from amaranth_stuff.modules import (
 # from .vid_settings_960x540_59Hz82 import (
 # from .vid_settings_800x600_56Hz25 import (
 # from .vid_settings_768x576_60Hz import (
-from .vid_settings_720x576_50Hz import (
+# from .vid_settings_720x576_50Hz import (
+from .vid_settings_960x540_50Hz import (
     mainPllParameters,
     mainPllClockMap,
     pixelSequence,
