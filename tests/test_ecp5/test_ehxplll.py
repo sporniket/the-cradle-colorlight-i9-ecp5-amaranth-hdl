@@ -25,9 +25,6 @@ from typing import List, Dict  # , Tuple, Optional
 from amaranth import *
 from amaranth.build import Platform
 
-### amaranth -- test deps
-from amaranth.asserts import *  # AnyConst, AnySeq, Assert, Assume, Cover, Past, Stable, Rose, Fell, Initial
-
 ### other deps
 from the_cradle import TheCradle
 from ecp5 import Ehxplll
@@ -82,11 +79,11 @@ def test_Ehxplll_instance_should_have_expected_properties():
     # verify
     ## managed signals
     assert isinstance(pll.clkin, ClockSignal) and pll.clkin.domain == "sync"
-    assert isinstance(pll.clkout0, Signal) and pll.clkout0.width == 1
-    assert isinstance(pll.clkout1, Signal) and pll.clkout1.width == 1
-    assert isinstance(pll.clkout2, Signal) and pll.clkout2.width == 1
-    assert isinstance(pll.clkout3, Signal) and pll.clkout3.width == 1
-    assert isinstance(pll.locked, Signal) and pll.locked.width == 1
+    assert isinstance(pll.clkout0, Signal) and len(pll.clkout0) == 1
+    assert isinstance(pll.clkout1, Signal) and len(pll.clkout1) == 1
+    assert isinstance(pll.clkout2, Signal) and len(pll.clkout2) == 1
+    assert isinstance(pll.clkout3, Signal) and len(pll.clkout3) == 1
+    assert isinstance(pll.locked, Signal) and len(pll.locked) == 1
 
     ## instanciation parameters
     expectedParams = baseParameters | {

@@ -48,6 +48,7 @@ from .vid_settings_960x540_50Hz import (
     scanlineSequence,
 )
 
+
 class TheCradle(Elaboratable):
     def __init__(self):
         pass
@@ -103,13 +104,15 @@ class TheCradle(Elaboratable):
         hsyncActive = Signal()  # Hsync pulse only for lines with displayable area
         m.d.comb += hsyncActive.eq(venable & hsync)
 
-        m.submodules.vsyncPulseClock = vsyncPulseClock = DomainRenamer("pixel")(ResetInserter(~vsync)(MonoImpulse()))
-        m.submodules.hsyncPulseClock = hsyncPulseClock = DomainRenamer("pixel")(ResetInserter(~hsync)(MonoImpulse()))
+        m.submodules.vsyncPulseClock = vsyncPulseClock = DomainRenamer("pixel")(
+            ResetInserter(~vsync)(MonoImpulse())
+        )
+        m.submodules.hsyncPulseClock = hsyncPulseClock = DomainRenamer("pixel")(
+            ResetInserter(~hsync)(MonoImpulse())
+        )
 
         ### The pixel source
-        videoSource = Signal(
-            24
-        )  # v[0:8] = blue, v[8:16] = green, v[16:24] = red
+        videoSource = Signal(24)  # v[0:8] = blue, v[8:16] = green, v[16:24] = red
         red, green, blue = Signal(8), Signal(8), Signal(8)
         m.d.comb += [
             blue.eq(videoSource[0:8]),
@@ -118,12 +121,22 @@ class TheCradle(Elaboratable):
         ]
 
         videoSolidBlink = Signal(24)
-        m.submodules.beat = beat = DomainRenamer("pixel")(EnableInserter(vsyncPulseClock.dataOut)(Sequencer([50, 50])))
+        m.submodules.beat = beat = DomainRenamer("pixel")(
+            EnableInserter(vsyncPulseClock.dataOut)(Sequencer([50, 50]))
+        )
         m.d.comb += videoSolidBlink.eq(Mux(beat.steps[0], 0x0055AA, 0xAA9955))
 
-        m.submodules.redGradient = redGradient = DomainRenamer("pixel")(ResetInserter(~vde)(RippleCounter(8)))
-        m.submodules.greenGradient = greenGradient = DomainRenamer("pixel")(ResetInserter(~venable)(EnableInserter(hsyncPulseClock.dataOut)(RippleCounter(8))))
-        m.d.comb += videoSource.eq(Cat(videoSolidBlink[0:8], greenGradient.value, redGradient.value))
+        m.submodules.redGradient = redGradient = DomainRenamer("pixel")(
+            ResetInserter(~vde)(RippleCounter(8))
+        )
+        m.submodules.greenGradient = greenGradient = DomainRenamer("pixel")(
+            ResetInserter(~venable)(
+                EnableInserter(hsyncPulseClock.dataOut)(RippleCounter(8))
+            )
+        )
+        m.d.comb += videoSource.eq(
+            Cat(videoSolidBlink[0:8], greenGradient.value, redGradient.value)
+        )
 
         ### The dvi link
         ctl0, ctl1, ctl2, ctl3 = Signal(), Signal(), Signal(), Signal()
@@ -160,14 +173,14 @@ class TheCradle(Elaboratable):
 
         hdmiMain = platform.request("hdmi", 0)
         m.d.comb += [
-            hdmiMain.c0_p.eq(channel0.dataOut),
-            hdmiMain.c0_n.eq(channel0.dataOutInverted),
-            hdmiMain.c1_p.eq(channel1.dataOut),
-            hdmiMain.c1_n.eq(channel1.dataOutInverted),
-            hdmiMain.c2_p.eq(channel2.dataOut),
-            hdmiMain.c2_n.eq(channel2.dataOutInverted),
-            hdmiMain.c3_p.eq(channelClock.dataOut),
-            hdmiMain.c3_n.eq(channelClock.dataOutInverted),
+            hdmiMain.c0_p.o.eq(channel0.dataOut),
+            hdmiMain.c0_n.o.eq(channel0.dataOutInverted),
+            hdmiMain.c1_p.o.eq(channel1.dataOut),
+            hdmiMain.c1_n.o.eq(channel1.dataOutInverted),
+            hdmiMain.c2_p.o.eq(channel2.dataOut),
+            hdmiMain.c2_n.o.eq(channel2.dataOutInverted),
+            hdmiMain.c3_p.o.eq(channelClock.dataOut),
+            hdmiMain.c3_n.o.eq(channelClock.dataOutInverted),
         ]
 
         ### What you should get at this point

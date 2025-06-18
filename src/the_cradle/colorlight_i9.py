@@ -25,7 +25,7 @@ import subprocess
 
 ### amaranth -- main deps
 from amaranth.build import *
-from amaranth.vendor.lattice_ecp5 import *
+from amaranth.vendor import *
 from amaranth_boards.resources import *  # from .resources import *
 
 
