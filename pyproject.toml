@@ -19,13 +19,16 @@ license = {file = "LICENSE"}
 authors = [{name="Sporniket", email="sporniket.studio@gmail.com"}]
 classifiers = [
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
     "Operating System :: OS Independent",
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
 ]
 dependencies = [
-    "amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@v0.0.4",
+    "amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@v0.0.6",
     'importlib-metadata; python_version>"3.8"',
 ]
 

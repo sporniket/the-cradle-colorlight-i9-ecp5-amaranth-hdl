@@ -24,9 +24,9 @@ import os
 import subprocess
 
 ### amaranth -- main deps
-from amaranth.build import *
-from amaranth.vendor import *
-from amaranth_boards.resources import *  # from .resources import *
+from amaranth.build import Subsignal, Resource, Pins, Attrs, Clock, Connector
+from amaranth.vendor import LatticeECP5Platform
+from amaranth_boards.resources import LEDResources  # from .resources import *
 
 
 # HDMI mapping,

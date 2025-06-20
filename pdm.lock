@@ -5,18 +5,18 @@
 groups = ["default", "build", "ci", "ecp5", "lint", "scripting"]
 strategy = []
 lock_version = "4.5.0"
-content_hash = "sha256:49bc26549712f4bcbcf94ff2440f9de2f6b4e1c8370b67e39e3bed68be732801"
+content_hash = "sha256:9cd2156d414098a434b411ebc077ba1e26461266a797cf201a1039afc045a313"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
 
 [[package]]
 name = "amaranth"
-version = "0.5.0"
+version = "0.5.6"
 requires_python = "~=3.8"
 git = "https://github.com/amaranth-lang/amaranth"
-ref = "v0.5.0"
-revision = "a0750b89c6060d9f809159a012a26cff4e22e69d"
+ref = "v0.5.6"
+revision = "eb8645fcc8b2dc0d348e8d53692f97e2b8e57836"
 summary = "Amaranth hardware definition language"
 dependencies = [
     "Jinja2~=3.0",
@@ -27,27 +27,27 @@ dependencies = [
 
 [[package]]
 name = "amaranth-boards"
-version = "0.1.dev246"
-requires_python = "~=3.8"
+version = "0.1.dev258"
+requires_python = "~=3.9"
 git = "https://github.com/amaranth-lang/amaranth-boards"
-ref = "aba2300dc83216523e1c98fdb22471cb4bac5027"
-revision = "aba2300dc83216523e1c98fdb22471cb4bac5027"
+ref = "c26a72e59c786b38e0e989ae64c6c2560ca7c29c"
+revision = "c26a72e59c786b38e0e989ae64c6c2560ca7c29c"
 summary = "Board and connector definitions for Amaranth HDL"
 dependencies = [
-    "amaranth<0.6,>=0.4",
+    "amaranth<0.7,>=0.5",
 ]
 
 [[package]]
 name = "amaranth-stuff-by-sporniket"
-version = "0.0.4"
-requires_python = ">=3.9"
+version = "0.0.6"
+requires_python = ">=3.10"
 git = "https://github.com/sporniket/amaranth-stuff"
-ref = "v0.0.4"
-revision = "7e3f900eacaae84b254fc29106948c3f33dc3798"
+ref = "v0.0.6"
+revision = "68aff1a6574b1242c2d56899a615c05a03b186ca"
 summary = "A curated collection of code written using the amaranth hdl"
 dependencies = [
-    "amaranth-boards @ git+https://github.com/amaranth-lang/amaranth-boards@aba2300dc83216523e1c98fdb22471cb4bac5027",
-    "amaranth[builtin-yosys] @ git+https://github.com/amaranth-lang/amaranth@v0.5.0",
+    "amaranth-boards @ git+https://github.com/amaranth-lang/amaranth-boards@c26a72e59c786b38e0e989ae64c6c2560ca7c29c",
+    "amaranth[builtin-yosys] @ git+https://github.com/amaranth-lang/amaranth@v0.5.6",
     "importlib-metadata; python_version > \"3.8\"",
 ]
 
@@ -66,15 +66,16 @@ files = [
 
 [[package]]
 name = "amaranth"
-version = "0.5.0"
+version = "0.5.6"
 extras = ["builtin-yosys"]
 requires_python = "~=3.8"
 git = "https://github.com/amaranth-lang/amaranth"
-ref = "v0.5.0"
-revision = "a0750b89c6060d9f809159a012a26cff4e22e69d"
+ref = "v0.5.6"
+revision = "eb8645fcc8b2dc0d348e8d53692f97e2b8e57836"
 summary = "Amaranth hardware definition language"
 dependencies = [
-    "amaranth @ git+https://github.com/amaranth-lang/amaranth@v0.5.0",
+    "amaranth @ git+https://github.com/amaranth-lang/amaranth@eb8645fcc8b2dc0d348e8d53692f97e2b8e57836",
+    "amaranth @ git+https://github.com/amaranth-lang/amaranth@v0.5.6",
     "amaranth-yosys>=0.40",
 ]
 
@@ -147,6 +148,9 @@ extras = ["filecache"]
 requires_python = ">=3.7"
 summary = "httplib2 caching for requests"
 dependencies = [
+    "cachecontrol==0.13.1",
+    "cachecontrol==0.13.1",
+    "cachecontrol==0.13.1",
     "cachecontrol==0.13.1",
     "cachecontrol==0.13.1",
     "cachecontrol==0.13.1",
