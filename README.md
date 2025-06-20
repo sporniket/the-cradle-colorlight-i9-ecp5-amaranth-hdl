@@ -59,19 +59,40 @@ Then a guest project can glue those commodities with an actual design, like e.g.
 
 > To build the bitstream only.
 
-```
+```shell
 git clone https://github.com/sporniket/the-cradle-colorlight-i9-ecp5-amaranth-hdl.git
 cd the-cradle-colorlight-i9-ecp5-amaranth-hdl
 python3 -m pdm sync
+
+# To output the default screen resolution (vga)
 python3 -m pdm run make_bitstream
+
+# To explicitely output a VGA screen (640*480)
+python3 -m pdm run make_bitstream_vga
+
+# To explicitely output a PAL screen (720*576)
+python3 -m pdm run make_bitstream_pal
+
+# To explicitely output a Quarter HD screen (960*540)
+python3 -m pdm run make_bitstream_quart_hd
 ```
 
 Then upload the bitstream file `build/top.bit` into the ECP5 with your favorite tool. 
 
 > If you have installed _openFPGALoader_, and with the Colorlight board plugged in : 
 
-```
+```shell
+# To output the default screen resolution (vga)
 python3 -m pdm run make_and_deploy
+
+# To explicitely output a VGA screen (640*480)
+python3 -m pdm run make_and_deploy_vga
+
+# To explicitely output a PAL screen (720*576)
+python3 -m pdm run make_and_deploy_pal
+
+# To explicitely output a Quarter HD screen (960*540)
+python3 -m pdm run make_and_deploy_quart_hd
 ```
 
 ## 4. Known issues

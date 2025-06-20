@@ -20,7 +20,7 @@ If not, see <https://www.gnu.org/licenses/>. 
 """
 
 ### builtin deps
-from typing import List  # , Dict, Tuple, Optional
+import argparse
 
 ### amaranth -- main deps
 from amaranth.hdl import Elaboratable
@@ -29,6 +29,14 @@ from amaranth.build import Platform
 ### project deps
 from .colorlight_i9 import Colorlight_I9_V7_2_Platform
 from .the_cradle import TheCradle
+from .settings import SETTINGS__PAL, SETTINGS__QUART_HD, SETTINGS__VGA
+
+
+SETTINGS_MAP = {
+    "vga":SETTINGS__VGA,
+    "pal":SETTINGS__PAL,
+    "quart_hd":SETTINGS__QUART_HD
+}
 
 
 class Builder:
@@ -55,5 +63,11 @@ To deploy on the colorlight :
         print(f"-- -- -- -- -- -- -- -- [ END OF Build ] -- -- -- -- -- -- -- --")
 
 
+def _createArgParser():
+    parser = argparse.ArgumentParser(prog="The Cradle builder",description="Build, and optionnally program the cradle")
+    parser.add_argument("preset", nargs="?",default="vga", choices=["vga","pal","quart_hd"])
+    return parser
+
 if __name__ == "__main__":
-    Builder(Colorlight_I9_V7_2_Platform(), TheCradle()).build()
+    args = _createArgParser().parse_args()
+    Builder(Colorlight_I9_V7_2_Platform(), TheCradle(settings=SETTINGS_MAP[args.preset])).build()

@@ -54,10 +54,19 @@ lint_ci = { composite = [ "reformat", "_lint_errors" ] }
 lint = { composite = [ "reformat", "lint_report" ] }
 # --- building ---
 make_bitstream = "python3 -m the_cradle.builder"
+make_bitstream_vga = "python3 -m the_cradle.builder vga"
+make_bitstream_pal = "python3 -m the_cradle.builder pal"
+make_bitstream_quart_hd = "python3 -m the_cradle.builder quart_hd"
 deploy_with_openfpgaloader = "openFPGALoader -c cmsisdap -m ./build/top.bit"
 make_and_deploy_ofl = { composite = ["clean", "make_bitstream", "deploy_with_openfpgaloader"] }
+make_and_deploy_ofl_vga = { composite = ["clean", "make_bitstream_vga", "deploy_with_openfpgaloader"] }
+make_and_deploy_ofl_pal = { composite = ["clean", "make_bitstream_pal", "deploy_with_openfpgaloader"] }
+make_and_deploy_ofl_quart_hd = { composite = ["clean", "make_bitstream_quart_hd", "deploy_with_openfpgaloader"] }
 # the default 'make and deploy' will use openFPGALoader.
 make_and_deploy = { composite = ["make_and_deploy_ofl"] }
+make_and_deploy_vga = { composite = ["make_and_deploy_ofl_vga"] }
+make_and_deploy_pal = { composite = ["make_and_deploy_ofl_pal"] }
+make_and_deploy_quart_hd = { composite = ["make_and_deploy_ofl_quart_hd"] }
 # --- test & coverage ---
 _coverage_run = "python3 -m coverage run --source=ecp5 --branch -m pytest"
 _coverage_report = "python3 -m coverage report -m"

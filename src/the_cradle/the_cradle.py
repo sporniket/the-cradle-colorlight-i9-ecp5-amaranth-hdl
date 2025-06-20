@@ -46,22 +46,12 @@ from amaranth_stuff.modules import (
     DviTmdsEncoder,
 )
 
-# from .vid_settings_640x480_59Hz94 import (
-# from .vid_settings_960x540_59Hz82 import (
-# from .vid_settings_800x600_56Hz25 import (
-# from .vid_settings_768x576_60Hz import (
-# from .vid_settings_720x576_50Hz import (
-from .vid_settings_960x540_50Hz import (
-    mainPllParameters,
-    mainPllClockMap,
-    pixelSequence,
-    scanlineSequence,
-)
+from .settings import SETTINGS__VGA
 
 
 class TheCradle(Elaboratable):
-    def __init__(self):
-        pass
+    def __init__(self, settings=SETTINGS__VGA):
+        self.settings = settings
 
     def createClockDomain(
         self, m: Module, name: str, sourceClock, sourceReset=None
@@ -74,6 +64,23 @@ class TheCradle(Elaboratable):
         return result
 
     def elaborate(self, platform: Platform) -> Module:
+        # uses settings
+        (
+            mainPllParameters,
+            mainPllClockMap,
+            pixelSequence,
+            scanlineSequence,
+        ) = (
+            self.settings["mainPllParameters"],
+            self.settings["mainPllClockMap"],
+            self.settings["pixelSequence"],
+            self.settings["scanlineSequence"],
+        )
+
+        print(f"Screen definition : {pixelSequence[2]} by {scanlineSequence[2]} pixels")
+        print()
+
+        # Start of building module
         m = Module()
 
         ## Setup blinky : shows that the fpga is running
