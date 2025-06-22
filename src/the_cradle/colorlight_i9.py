@@ -1,6 +1,6 @@
 """
 ---
-(c) 2022,2023 David SPORN
+(c) 2022~2025 David SPORN
 ---
 This is part of Sporniket's "The Cradle for MuseLab's Colorlight i9" project.
 
